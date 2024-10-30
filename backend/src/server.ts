@@ -2,7 +2,7 @@ import http from 'http'
 import fs from 'fs'
 import path from 'path'
 import url from 'url'
-import { listFiles, readAFile, deleteAFile } from './lib/functions'
+import { listFiles, readAFile, deleteAFile, addAFile } from './lib/functions'
 
 const directory = "docs"
 
@@ -56,28 +56,29 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
   // Delete file
   if (parsedPath === "/delete" && fileName && req.method === "DELETE") {
     deleteAFile(fileName).then(file => {
-      res.writeHead(200, { "content-type": "text/plain" })
-      res.end(`${file} was deleted successfully...`)
+      res.writeHead(200, { "content-type": "application/json" })
+      res.end(JSON.stringify(file))
     }).catch(err => {
       console.error(err)
     })
     return
   }
-
-  // Create file
-  if (req.url === "/create") {
-    const fileName = "newfile.txt"
-    const filePath = path.join(directory, fileName)
-    const fileContent = "Hello world! I am a new file."
-    fs.writeFile(filePath, fileContent, 'utf8', (err) => {
-      if (err) {
-        console.error(`Error found: ${err}`)
-        res.writeHead(500, { "content-type": "text/plain" })
-        res.end("Error found")
-        return
+  
+  // Add file
+  if (parsedPath === "/add" && req.method === "POST") {
+    let body = ''
+    req.on('data', chunk => body += chunk)
+    req.on('end', async () => {
+      const { filename, fileContent } = JSON.parse(body)
+      const success = await addAFile(filename, fileContent)
+      if (success) {
+        res.writeHead(201, { 'content-type': 'application/json' })
+        res.end(JSON.stringify({ message: 'File was created successfully...' }))
+      } else {
+        res.writeHead(500, { 'Content-type': 'application/json'})
+        res.end(JSON.stringify({ message: 'Server error. File not created...' }))
       }
-      res.writeHead(201, { "content-type": "text/plain" })
-      res.end(`${fileName} was created successfully...`)
+      return
     })
     return
   }

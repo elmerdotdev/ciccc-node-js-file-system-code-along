@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -53,28 +62,30 @@ const server = http_1.default.createServer((req, res) => {
     // Delete file
     if (parsedPath === "/delete" && fileName && req.method === "DELETE") {
         (0, functions_1.deleteAFile)(fileName).then(file => {
-            res.writeHead(200, { "content-type": "text/plain" });
-            res.end(`${file} was deleted successfully...`);
+            res.writeHead(200, { "content-type": "application/json" });
+            res.end(JSON.stringify(file));
         }).catch(err => {
             console.error(err);
         });
         return;
     }
-    // Create file
-    if (req.url === "/create") {
-        const fileName = "newfile.txt";
-        const filePath = path_1.default.join(directory, fileName);
-        const fileContent = "Hello world! I am a new file.";
-        fs_1.default.writeFile(filePath, fileContent, 'utf8', (err) => {
-            if (err) {
-                console.error(`Error found: ${err}`);
-                res.writeHead(500, { "content-type": "text/plain" });
-                res.end("Error found");
-                return;
+    // Add file
+    if (parsedPath === "/add" && req.method === "POST") {
+        let body = '';
+        req.on('data', chunk => body += chunk);
+        req.on('end', () => __awaiter(void 0, void 0, void 0, function* () {
+            const { filename, fileContent } = JSON.parse(body);
+            const success = yield (0, functions_1.addAFile)(filename, fileContent);
+            if (success) {
+                res.writeHead(201, { 'content-type': 'application/json' });
+                res.end(JSON.stringify({ message: 'File was created successfully...' }));
             }
-            res.writeHead(201, { "content-type": "text/plain" });
-            res.end(`${fileName} was created successfully...`);
-        });
+            else {
+                res.writeHead(500, { 'Content-type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Server error. File not created...' }));
+            }
+            return;
+        }));
         return;
     }
     // Append file

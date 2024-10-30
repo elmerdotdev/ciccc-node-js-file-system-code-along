@@ -27,6 +27,18 @@ export const readAFile = async (filename: string): Promise<string | undefined> =
   }
 }
 
+// Add a file
+export const addAFile = async (filename: string, content: string): Promise<boolean> => {
+  try {
+    const filePath = path.join(docsDirectory, filename)
+    await fs.promises.writeFile(filePath, content)
+    return true
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+}
+
 // Delete a file
 export const deleteAFile = async (filename: string): Promise<string | undefined> => {
   try {

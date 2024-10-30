@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAFile = exports.readAFile = exports.listFiles = void 0;
+exports.deleteAFile = exports.addAFile = exports.readAFile = exports.listFiles = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const directory = 'docs';
@@ -42,6 +42,19 @@ const readAFile = (filename) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.readAFile = readAFile;
+// Add a file
+const addAFile = (filename, content) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const filePath = path_1.default.join(docsDirectory, filename);
+        yield fs_1.default.promises.writeFile(filePath, content);
+        return true;
+    }
+    catch (err) {
+        console.error(err);
+        return false;
+    }
+});
+exports.addAFile = addAFile;
 // Delete a file
 const deleteAFile = (filename) => __awaiter(void 0, void 0, void 0, function* () {
     try {
