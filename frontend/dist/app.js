@@ -37,11 +37,9 @@ const saveFile = (filename, fileContent) => __awaiter(void 0, void 0, void 0, fu
 });
 // Delete file
 const deleteFile = (filename) => __awaiter(void 0, void 0, void 0, function* () {
-    const res = yield fetch(`${BACKEND_URL}/delete?filename=${filename}`, {
+    yield fetch(`${BACKEND_URL}/delete?filename=${filename}`, {
         method: "DELETE"
     });
-    const data = yield res.json();
-    console.log(`Deleted file ${data}`);
     buildList();
 });
 // Submit form
@@ -52,16 +50,19 @@ fileForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, fun
 // Build list
 const buildList = () => __awaiter(void 0, void 0, void 0, function* () {
     filesList.innerHTML = '';
+    fileContent.textContent = '';
     const files = yield getFiles();
     files.forEach(file => {
         const li = document.createElement('li');
         li.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'list-group-item');
-        li.textContent = file;
-        li.addEventListener('click', () => readFile(file));
+        const span = document.createElement('span');
+        span.textContent = file;
+        span.addEventListener('click', () => readFile(file));
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add("btn", "btn-danger");
         deleteBtn.textContent = "Delete";
         deleteBtn.addEventListener('click', () => deleteFile(file));
+        li.appendChild(span);
         li.appendChild(deleteBtn);
         filesList.appendChild(li);
     });

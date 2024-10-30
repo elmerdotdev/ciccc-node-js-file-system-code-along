@@ -32,11 +32,9 @@ const saveFile = async (filename: string, fileContent: string): Promise<void> =>
 
 // Delete file
 const deleteFile = async (filename: string): Promise<void> => {
-  const res = await fetch(`${BACKEND_URL}/delete?filename=${filename}`, {
+  await fetch(`${BACKEND_URL}/delete?filename=${filename}`, {
     method: "DELETE"
   })
-  const data = await res.json()
-  console.log(`Deleted file ${data}`)
   buildList()
 }
 
@@ -49,19 +47,23 @@ fileForm.addEventListener('submit', async (e: Event) => {
 // Build list
 const buildList = async (): Promise<void> => {
   filesList.innerHTML = ''
+  fileContent.textContent = ''
   const files = await getFiles()
 
   files.forEach(file => {
     const li = document.createElement('li')
     li.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'list-group-item')
-    li.textContent = file
-    li.addEventListener('click', () => readFile(file))
+
+    const span = document.createElement('span')
+    span.textContent = file
+    span.addEventListener('click', () => readFile(file))
 
     const deleteBtn = document.createElement('button')
     deleteBtn.classList.add("btn", "btn-danger")
     deleteBtn.textContent = "Delete"
     deleteBtn.addEventListener('click', () => deleteFile(file))
     
+    li.appendChild(span)
     li.appendChild(deleteBtn)
     filesList.appendChild(li)
   })

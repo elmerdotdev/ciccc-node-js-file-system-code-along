@@ -63,7 +63,7 @@ const server = http_1.default.createServer((req, res) => {
     if (parsedPath === "/delete" && fileName && req.method === "DELETE") {
         (0, functions_1.deleteAFile)(fileName).then(file => {
             res.writeHead(200, { "content-type": "application/json" });
-            res.end(JSON.stringify(file));
+            res.end(JSON.stringify({ file }));
         }).catch(err => {
             console.error(err);
         });
