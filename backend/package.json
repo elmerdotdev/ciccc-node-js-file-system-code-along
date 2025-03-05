@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npx tsc --watch\" \"nodemon dist/server.js\"",
+    "dev2": "concurrently \"npx tsc --watch\" \"nodemon dist/server2.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
