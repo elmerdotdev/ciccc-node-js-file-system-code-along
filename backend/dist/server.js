@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const url_1 = __importDefault(require("url"));
 const functions_1 = require("./lib/functions");
 const directory = "docs";
 const server = http_1.default.createServer((req, res) => {
@@ -30,9 +29,9 @@ const server = http_1.default.createServer((req, res) => {
         return;
     }
     // Parse url
-    const parsedUrl = url_1.default.parse(req.url || '', true);
-    const fileName = parsedUrl.query.filename;
-    const parsedPath = parsedUrl.pathname;
+    const myUrl = new URL(req.url || '', `http://${req.headers.host}`);
+    const parsedPath = myUrl.pathname;
+    const fileName = myUrl.searchParams.get('filename') || "";
     // Home route
     if (parsedPath === "/") {
         res.writeHead(200, { "content-type": "text/plain" });
@@ -89,8 +88,7 @@ const server = http_1.default.createServer((req, res) => {
         return;
     }
     // Append file
-    if (req.url === "/update") {
-        const fileName = "update.txt";
+    if (parsedPath === "/update" && req.method === "PATCH") {
         const filePath = path_1.default.join(directory, fileName);
         const fileContent = "\r\nI AM NEW CONTENT!";
         fs_1.default.appendFile(filePath, fileContent, 'utf8', (err) => {
