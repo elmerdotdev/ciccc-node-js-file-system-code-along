@@ -20,9 +20,9 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
   }
 
   // Parse url
-  const parsedUrl = url.parse(req.url || '', true)
-  const fileName = parsedUrl.query.filename as string | undefined
-  const parsedPath = parsedUrl.pathname
+  const myUrl = new URL(req.url || '', `http://${req.headers.host}`)
+  const parsedPath = myUrl.pathname
+  const fileName = myUrl.searchParams.get('filename') || ""
 
   // Home route
   if (parsedPath === "/") {
@@ -84,8 +84,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
   }
 
   // Append file
-  if (req.url === "/update") {
-    const fileName = "update.txt"
+  if (parsedPath === "/update"  && req.method === "PATCH") {
     const filePath = path.join(directory, fileName)
     const fileContent = "\r\nI AM NEW CONTENT!"
     fs.appendFile(filePath, fileContent, 'utf8', (err) => {

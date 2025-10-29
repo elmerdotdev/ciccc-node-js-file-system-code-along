@@ -8,8 +8,8 @@ const PORT = 3500;
 const FILE_PATH = path.join(__dirname, '../docs', 'data.txt');
 
 const server = http.createServer((req, res) => {
-  const parsedUrl = url.parse(req.url || '', true);
-  const { pathname } = parsedUrl;
+  const myUrl = new URL(req.url || '', `http://${req.headers.host}`);
+  const pathname = myUrl.pathname;
 
   if (pathname === "/") {
     res.writeHead(200, { "Content-Type": "text/plain" });

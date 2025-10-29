@@ -5,14 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const fs_1 = __importDefault(require("fs"));
-const url_1 = __importDefault(require("url"));
 const path_1 = __importDefault(require("path"));
 const PORT = 3500;
 // const FILE_PATH = './docs/data.txt';
 const FILE_PATH = path_1.default.join(__dirname, '../docs', 'data.txt');
 const server = http_1.default.createServer((req, res) => {
-    const parsedUrl = url_1.default.parse(req.url || '', true);
-    const { pathname } = parsedUrl;
+    const myUrl = new URL(req.url || '', `http://${req.headers.host}`);
+    const pathname = myUrl.pathname;
     if (pathname === "/") {
         res.writeHead(200, { "Content-Type": "text/plain" });
         res.end("Welcome to the File Manager API");
